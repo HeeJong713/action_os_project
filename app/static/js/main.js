@@ -4,11 +4,19 @@ let userAnswers = [];
 // 簡易セッションID
 const sessionId = 'sess_' + Math.random().toString(36).substr(2, 9); 
 
-document.addEventListener('DOMContentLoaded', () => {
+// 画面の読み込み状態に関わらず、要素があれば即座にクイズを描画する
+function initQuiz() {
     if (document.getElementById('quiz-container')) {
         renderQuestion();
     }
-});
+}
+
+// スクリプトが読み込まれたらすぐに実行判定
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initQuiz);
+} else {
+    initQuiz();
+}
 
 function renderQuestion() {
     const currentQ = quizQuestions[currentIndex];
