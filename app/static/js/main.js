@@ -1,26 +1,26 @@
+// app/static/js/main.js
 let currentIndex = 0;
 let userAnswers = [];
-// 簡易的なセッションIDの生成（本来はより強固なUUIDライブラリを推奨）
+// 簡易セッションID
 const sessionId = 'sess_' + Math.random().toString(36).substr(2, 9); 
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderQuestion();
+    if (document.getElementById('quiz-container')) {
+        renderQuestion();
+    }
 });
 
 function renderQuestion() {
     const currentQ = quizQuestions[currentIndex];
     
-    // UIの更新
     document.getElementById('question-text').innerText = currentQ.text;
     document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${quizQuestions.length}`;
     
-    // プログレスバーの更新
     const progressPercent = ((currentIndex) / quizQuestions.length) * 100;
     document.getElementById('progress-bar-fill').style.width = `${progressPercent}%`;
 
-    // 選択肢ボタンの生成
     const optionsContainer = document.getElementById('options-container');
-    optionsContainer.innerHTML = ''; // 一旦クリア
+    optionsContainer.innerHTML = ''; 
     
     scaleLabels.forEach(scale => {
         const btn = document.createElement('button');
@@ -32,13 +32,11 @@ function renderQuestion() {
 }
 
 function handleAnswer(questionId, answerValue) {
-    // 回答を記録
     userAnswers.push({
         q_id: questionId,
         value: answerValue
     });
 
-    // 次の問題へ、または結果送信へ
     if (currentIndex < quizQuestions.length - 1) {
         currentIndex++;
         renderQuestion();
@@ -48,8 +46,8 @@ function handleAnswer(questionId, answerValue) {
 }
 
 async function submitAnswers() {
-    // 送信中はUIをローディング状態にする
-    document.getElementById('quiz-container').innerHTML = '<h2>解析中...</h2><p>あなたのOSを特定しています</p>';
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = '<h2 style="color:var(--accent-color);">解析中...</h2><p>OSコア・ベクトルを計算しています。</p>';
 
     const payload = {
         session_id: sessionId,
@@ -65,13 +63,13 @@ async function submitAnswers() {
 
         if (response.ok) {
             const result = await response.json();
-            // 診断完了！結果ページへリダイレクト（assessment_idを渡す）
+            // 診断完了！結果ページへリダイレクト
             window.location.href = `/result?id=${result.assessment_id}`;
         } else {
-            alert('通信エラーが発生しました。');
+            container.innerHTML = '<h2>エラーが発生しました</h2><p>サーバー側の処理に失敗しました。</p>';
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('エラーが発生しました。時間を置いて再度お試しください。');
+        container.innerHTML = '<h2>通信エラー</h2><p>ネットワークを確認してください。</p>';
     }
 }

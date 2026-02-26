@@ -1,3 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* 診断画面特有のスタイル */
+    .quiz-wrapper {
+        width: 100%;
+        max-width: 600px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .progress-header {
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+    #progress-text {
+        font-size: 0.9rem;
+        color: var(--accent-color);
+        font-weight: bold;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    .progress-bar-bg {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--accent-color);
+        transition: width 0.3s ease;
+    }
+    #question-text {
+        font-size: 1.3rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        min-height: 80px; /* 質問文の長さによるガタつきを防止 */
+    }
+    .options-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    .option-btn {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text-main);
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .option-btn:hover {
+        background: rgba(56, 189, 248, 0.1);
+        border-color: var(--accent-color);
+    }
+</style>
+
 <div id="quiz-container" class="quiz-wrapper">
     <div class="progress-header">
         <span id="progress-text">1 / 110</span>
@@ -7,8 +71,13 @@
     </div>
 
     <div class="question-box">
-        <h2 id="question-text">読み込み中...</h2>
+        <h2 id="question-text">システムを初期化中...</h2>
     </div>
 
-    <div id="options-container" class="options-container"></div>
+    <div id="options-container" class="options-container">
+        </div>
 </div>
+
+<script src="{{ url_for('static', filename='js/questions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
