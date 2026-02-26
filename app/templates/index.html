@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">あなたの「行動OS」を解析せよ。</h2>
+    
+    <p style="color: var(--text-sub); max-width: 600px; line-height: 1.8; font-size: 1.1rem;">
+        全110問の高解像度アセスメント。<br>
+        経済学・データサイエンスの視点から、あなたの「思考のエンジン（Core）」と「環境適合パラメーター」を数理的に導き出します。
+    </p>
+    
+    <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 10px; max-width: 500px; text-align: left;">
+        <ul style="color: var(--text-sub); font-size: 0.95rem; line-height: 1.8; margin: 0; padding-left: 1.5rem;">
+            <li>所要時間：約5〜10分</li>
+            <li>深く考えず、直感でサクサクとお答えください。</li>
+            <li>結果は4次元ベクトルと3つの隠し変数で可視化されます。</li>
+        </ul>
+    </div>
+
+    <a href="/quiz" class="btn">診断システムを起動する</a>
+{% endblock %}
