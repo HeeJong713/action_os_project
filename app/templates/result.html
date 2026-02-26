@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="result-container">
+    
+    <header class="result-header">
+        <p class="sub-title">あなたの行動OS</p>
+        <h1 class="os-type">{{ assessment.result_type }}</h1>
+        <p class="match-rate">モデル適合率: {{ (100 - (assessment.distance * 20)) | round(1) }}%</p>
+    </header>
+
+    <section class="analysis-section">
+        <h2>OSコア・ベクトル</h2>
+        <div class="chart-wrapper">
+            <canvas id="osRadarChart"></canvas>
+        </div>
+        <div id="chart-data" 
+             data-f="{{ assessment.vector_f }}" 
+             data-p="{{ assessment.vector_p }}" 
+             data-s="{{ assessment.vector_s }}" 
+             data-v="{{ assessment.vector_v }}"
+             style="display: none;"></div>
+    </section>
+
+    <section class="modifiers-section">
+        <h2>環境適合パラメーター</h2>
+        
+        <div class="modifier-item">
+            <label>リスク許容度</label>
+            <div class="gauge-bg">
+                <div class="gauge-fill risk-color" style="width: {{ assessment.mod_risk }}%;"></div>
+            </div>
+            <span class="gauge-value">{{ assessment.mod_risk | round(1) }}%</span>
+        </div>
+
+        <div class="modifier-item">
+            <label>情動耐性（レジリエンス）</label>
+            <div class="gauge-bg">
+                <div class="gauge-fill resilience-color" style="width: {{ assessment.mod_resilience }}%;"></div>
+            </div>
+            <span class="gauge-value">{{ assessment.mod_resilience | round(1) }}%</span>
+        </div>
+
+        <div class="modifier-item">
+            <label>社会的バッテリー</label>
+            <div class="gauge-bg">
+                <div class="gauge-fill battery-color" style="width: {{ assessment.mod_battery }}%;"></div>
+            </div>
+            <span class="gauge-value">{{ assessment.mod_battery | round(1) }}%</span>
+        </div>
+    </section>
+
+    <section class="share-section">
+        <p>あなたのOSをチームと共有して、組織のインピーダンスを最適化しよう。</p>
+        <button class="share-btn x-twitter" onclick="shareOnX()">𝕏 で結果をシェア</button>
+        <button class="share-btn copy-link" onclick="copyUrl()">URLをコピー</button>
+    </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // HTMLのdata属性からバックエンドの数値を抽出
+    const dataDiv = document.getElementById('chart-data');
+    // -1.0~1.0のスコアを、レーダーチャート用に扱いやすいよう変換する等の処理をここで行う
+    const fScore = parseFloat(dataDiv.dataset.f);
+    const pScore = parseFloat(dataDiv.dataset.p);
+    const sScore = parseFloat(dataDiv.dataset.s);
+    const vScore = parseFloat(dataDiv.dataset.v);
+
+// -1.0 ~ 1.0 のスコアを 0 ~ 100 のパーセンテージに変換する関数
+const toPositivePercent = (score) => ((score + 1) / 2) * 100;
+const toNegativePercent = (score) => 100 - toPositivePercent(score);
+
+// 8軸分のデータを生成（正の極4つ、負の極4つを交互または円環状に配置）
+const chartData = [
+    toPositivePercent(fScore), // System (論理)
+    toPositivePercent(pScore), // Vision (直感)
+    toPositivePercent(sScore), // Prototype (試行)
+    toPositivePercent(vScore), // Autonomy (自律)
+    toNegativePercent(fScore), // Human (対人)
+    toNegativePercent(pScore), // Evidence (実証)
+    toNegativePercent(sScore), // Blueprint (計画)
+    toNegativePercent(vScore)  // Contribution (貢献)
+];
+
+// レーダーチャートの描画設定
+const ctx = document.getElementById('osRadarChart').getContext('2d');
+const osRadarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+        labels: [
+            'System (論理)', 'Vision (直感)', 'Prototype (試行)', 'Autonomy (自律)', 
+            'Human (対人)', 'Evidence (実証)', 'Blueprint (計画)', 'Contribution (貢献)'
+        ],
+        datasets: [{
+            label: 'あなたのOSコア特性',
+            data: chartData,
+            backgroundColor: 'rgba(54, 162, 235, 0.4)', // 半透明のブルー
+            borderColor: 'rgba(54, 162, 235, 1)',       // 境界線のブルー
+            pointBackgroundColor: 'rgba(255, 255, 255, 1)',
+            pointBorderColor: 'rgba(54, 162, 235, 1)',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            r: {
+                angleLines: {
+                    color: 'rgba(255, 255, 255, 0.2)' // 放射状の線の色（ダークテーマ想定）
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.2)', // 網目の線の色
+                    circular: true // カクカクではなく円形のグリッドにする場合
+                },
+                pointLabels: {
+                    color: '#e0e0e0', // ラベル文字の色
+                    font: {
+                        size: 12,
+                        family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif"
+                    }
+                },
+                ticks: {
+                    display: false, // メモリの数値（0, 20, 40...）は非表示にしてスッキリさせる
+                    min: 0,
+                    max: 100,
+                    stepSize: 25
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false // 「あなたのOSコア特性」という凡例を隠す（UIをシンプルにするため）
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.raw.toFixed(1) + '%';
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
