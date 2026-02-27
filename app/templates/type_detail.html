@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .detail-container {
+        width: 100%;
+        max-width: 800px;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 3rem;
+        border-radius: 12px;
+        text-align: left;
+    }
+    .os-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid var(--accent-color);
+        color: var(--accent-color);
+        border-radius: 50px;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    .section-title {
+        color: var(--accent-color);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 0.5rem;
+        margin-top: 3rem;
+        font-size: 1.5rem;
+    }
+    .sw-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+    .card {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 1.5rem;
+        border-radius: 8px;
+    }
+    .card h4 { margin-top: 0; }
+    .card ul { padding-left: 1.2rem; color: var(--text-sub); }
+    .card ul li { margin-bottom: 0.5rem; }
+    
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+        .sw-grid { grid-template-columns: 1fr; }
+        .detail-container { padding: 1.5rem; }
+    }
+</style>
+
+<div class="detail-container">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <span class="os-badge">OS DATABASE</span>
+        <h1 style="font-size: 3rem; margin: 0.5rem 0;">{{ detail.type_id }}</h1>
+        <h2 style="color: var(--text-main); font-size: 1.3rem;">{{ basic.title }}</h2>
+    </div>
+
+    <p style="color: var(--text-sub); line-height: 1.8; font-size: 1.1rem;">
+        {{ basic.core_desc }}<br><br>
+        {{ basic.target }}
+    </p>
+
+    <h3 class="section-title">組織動学：ポジションと役割</h3>
+    <div class="card" style="border-left: 4px solid var(--accent-color);">
+        <h4 style="color: #fff;">推奨階層：{{ detail.role.position }}</h4>
+        <p style="color: var(--text-sub); line-height: 1.6;">{{ detail.role.role_desc }}</p>
+    </div>
+
+    <h3 class="section-title">OSの武器とボトルネック</h3>
+    <div class="sw-grid">
+        <div class="card" style="border-top: 3px solid #10b981;">
+            <h4 style="color: #10b981;">強み (Strengths)</h4>
+            <ul>
+                {% for s in detail.sw.s %}
+                    <li>{{ s }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="card" style="border-top: 3px solid #ef4444;">
+            <h4 style="color: #ef4444;">弱点 (Weaknesses)</h4>
+            <ul>
+                {% for w in detail.sw.w %}
+                    <li>{{ w }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <h3 class="section-title">インピーダンス整合（相性分析）</h3>
+    <div class="sw-grid">
+        <div class="card">
+            <h4>最高の翻訳者パートナー</h4>
+            <a href="/type/{{ detail.matches.translator }}" class="os-badge" style="font-size: 0.9rem; margin-bottom:0.5rem;">{{ detail.matches.translator }}</a>
+            <p style="color: var(--text-sub); font-size: 0.9rem; line-height: 1.5;">{{ detail.matches.translator_desc }}</p>
+        </div>
+        <div class="card">
+            <h4>対極に位置するOS</h4>
+            <a href="/type/{{ detail.matches.opposite }}" class="os-badge" style="font-size: 0.9rem; border-color: #ef4444; color: #ef4444; margin-bottom:0.5rem;">{{ detail.matches.opposite }}</a>
+            <p style="color: var(--text-sub); font-size: 0.9rem; line-height: 1.5;">{{ detail.matches.opposite_desc }}</p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 4rem;">
+        <a href="/" class="btn">トップページへ戻る</a>
+    </div>
+</div>
+{% endblock %}
